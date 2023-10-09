@@ -1,13 +1,18 @@
 package com.bytecode.bytecodeecommerce.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.ToString;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "CarritoCompras", schema = "Productos")
 public class CarritoCompras {
@@ -19,12 +24,12 @@ public class CarritoCompras {
     @ManyToOne
     @JoinColumn(name = "ClienteID")
     @ToString.Exclude
+    @JsonIgnore
     private Cliente cliente;
 
-    @ManyToOne
-    @JoinColumn(name = "ProductoID")
-    private Producto producto;
+    @OneToMany(mappedBy = "carritoCompras", cascade = CascadeType.ALL, orphanRemoval = true)
 
-    @Column(name = "Cantidad")
-    private int cantidad;
+    private List<ItemCarrito> items = new ArrayList<>();  // Inicializa la lista en el constructor
+
+
 }
