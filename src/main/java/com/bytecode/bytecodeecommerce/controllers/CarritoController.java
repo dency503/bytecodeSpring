@@ -6,6 +6,8 @@ import com.bytecode.bytecodeecommerce.Repository.ItemCarritoRepository;
 import com.bytecode.bytecodeecommerce.Repository.ProductoRepository;
 import com.bytecode.bytecodeecommerce.models.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +24,7 @@ public class CarritoController {
     private final ClienteRepository clienteRepository;
     private final ProductoRepository productoRepository;
     private final ItemCarritoRepository itemCarritoRepository;
-    @GetMapping("/")
+    @GetMapping
     public Optional<CarritoCompras> getCarrito(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
@@ -35,22 +37,49 @@ public class CarritoController {
         return Optional.empty();
     }
 
-    @PostMapping("/")
+    @DeleteMapping("/item/{id}")
     @Transactional
-    public CarritoCompras crearCarrito(@RequestBody CarritoCompras carrito, Authentication authentication) {
+    public ResponseEntity<String> eliminarItem(@PathVariable Long id, Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
         if (userDetails instanceof Usuario) {
             Usuario user = (Usuario) userDetails;
-
             Optional<Cliente> clienteOptional = clienteRepository.findByUsuario(user);
-            clienteOptional.ifPresent(carrito::setCliente);
-            return carritoRepository.save(carrito);
+
+            if (clienteOptional.isPresent()) {
+                Optional<CarritoCompras> cart = carritoRepository.findByCliente(clienteOptional.get());
+
+                if (cart.isPresent()) {
+                    CarritoCompras carrito = cart.get();
+                    Optional<ItemCarrito> itemCarritoOptional = itemCarritoRepository.findById(id);
+
+                    if (itemCarritoOptional.isPresent()) {
+                        ItemCarrito item = itemCarritoOptional.get();
+
+                        // Eliminar el elemento del carrito
+                        carrito.getItems().remove(item);
+
+                        // Guardar los cambios en el carrito de compras
+                        carritoRepository.save(carrito);
+
+                        // Eliminar el elemento del repositorio de items del carrito
+                        itemCarritoRepository.delete(item);
+
+                        return ResponseEntity.ok("Elemento eliminado del carrito.");
+                    } else {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Elemento no encontrado.");
+                    }
+                } else {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Carrito de compras no encontrado.");
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cliente no encontrado.");
+            }
         }
 
-        // Manejar el caso cuando el usuario no está autenticado
-        return null;
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Acceso no autorizado.");
     }
+
 
     @PostMapping("/{id}/{cantidad}")
     @Transactional
