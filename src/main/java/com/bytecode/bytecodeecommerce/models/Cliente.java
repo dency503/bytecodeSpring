@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "Clientes", schema = "Cliente")
-public class Cliente {
+public class Cliente  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ClienteID")
@@ -36,11 +36,11 @@ public class Cliente {
     @NotEmpty(message = "El correo electrónico no puede estar vacío")
     @Column(name = "Email")
     private String email;
-     @ManyToOne
-       @JoinColumn(name = "UsuarioID")
-     @JsonIgnore
-     @ToString.Exclude
-       private Usuario usuario;
+    @ManyToOne
+    @JoinColumn(name = "UsuarioID")
+    @JsonIgnore
+    @ToString.Exclude
+    private Usuario usuario;
 
     @Pattern(regexp = "\\d{10}", message = "El número de teléfono debe tener 10 dígitos")
     @Column(name = "Telefono")
@@ -54,13 +54,4 @@ public class Cliente {
     private Date fechaCreacion;
 
 
-   /* @Override
-    public String toString() {
-        return "Cliente{" +
-                "clienteId=" + clienteId +
-                ", nombreCliente='" + nombreCliente + '\'' +
-                ", apellidoCliente='" + apellidoCliente + '\'' +
-                ", email='" + email + '\'' +
-                '}';
-    }*/
 }

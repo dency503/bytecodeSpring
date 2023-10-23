@@ -24,8 +24,8 @@ public class UserController {
     public String username(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        if (userDetails instanceof Usuario) {
-            Usuario user = (Usuario) userDetails; // Asegúrate de que Usuario sea tu clase de entidad
+        if (userDetails instanceof Usuario user) {
+            // Asegúrate de que Usuario sea tu clase de entidad
 
             // Obtén el cliente usando el ID del usuario
             Optional<Cliente> clienteOptional = clienteRepository.findByUsuario(user);
@@ -49,14 +49,11 @@ public class UserController {
 
     @GetMapping("/user")
     public ResponseEntity<?> obtenerCliente(Authentication authentication) {
-        if (authentication == null || !(authentication.getPrincipal() instanceof UserDetails)) {
+        if (authentication == null || !(authentication.getPrincipal() instanceof UserDetails userDetails)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
         }
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
-        if (userDetails instanceof Usuario) {
-            Usuario user = (Usuario) userDetails;
+        if (userDetails instanceof Usuario user) {
 
             Optional<Cliente> clienteOptional = clienteRepository.findByUsuario(user);
 

@@ -1,4 +1,4 @@
-package com.bytecode.bytecodeecommerce.controllers;
+package com.bytecode.bytecodeecommerce.dao.request;
 
 
 import lombok.AllArgsConstructor;

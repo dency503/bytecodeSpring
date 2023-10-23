@@ -28,12 +28,12 @@ public class CarritoController {
     public Optional<CarritoCompras> getCarrito(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        if (userDetails instanceof Usuario) {
-            Usuario user = (Usuario) userDetails;
+        if (userDetails instanceof Usuario user) {
 
             Optional<Cliente> clienteOptional = clienteRepository.findByUsuario(user);
 
-            return carritoRepository.findByCliente(clienteOptional.orElse(null));}
+           return carritoRepository.findByCliente(clienteOptional.orElse(null));
+            }
         return Optional.empty();
     }
 
@@ -42,8 +42,7 @@ public class CarritoController {
     public ResponseEntity<String> eliminarItem(@PathVariable Long id, Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        if (userDetails instanceof Usuario) {
-            Usuario user = (Usuario) userDetails;
+        if (userDetails instanceof Usuario user) {
             Optional<Cliente> clienteOptional = clienteRepository.findByUsuario(user);
 
             if (clienteOptional.isPresent()) {
