@@ -37,7 +37,7 @@ public class AuthorizationController {
 
 
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping()
     public ResponseEntity<String> sayHelloAdmin() {
         return ResponseEntity.ok("Hello Admin");

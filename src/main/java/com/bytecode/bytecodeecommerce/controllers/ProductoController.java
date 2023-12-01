@@ -3,7 +3,10 @@ package com.bytecode.bytecodeecommerce.controllers;
 import com.bytecode.bytecodeecommerce.Service.ProductoService;
 import com.bytecode.bytecodeecommerce.models.Producto;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,14 +16,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/productos")
+@RequiredArgsConstructor
 public class ProductoController {
 
     private final ProductoService productoService;
 
-    @Autowired
-    public ProductoController(ProductoService productoService) {
-        this.productoService = productoService;
-    }
+
 
     @GetMapping
     public ResponseEntity<List<Producto>> obtenerTodosProductos() {
@@ -70,4 +71,28 @@ public class ProductoController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    @GetMapping("/categoria/{categoriaId}")
+    public ResponseEntity<Page<Producto>> getProductosPorCategoriaId(@PathVariable int categoriaId, Pageable pageable) {
+        Page<Producto> productos = productoService.getProductosByCategoriaId(categoriaId, pageable);
+
+        if (productos.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Puedes ajustar el HttpStatus según tus necesidades
+        } else {
+            return new ResponseEntity<>(productos, HttpStatus.OK);
+        }
+    }
+    @GetMapping("/buscar")
+    public ResponseEntity<Page<Producto>> buscarProductosPorTermino(
+            @RequestParam String termino,
+            Pageable pageable) {
+
+        Page<Producto> productos = productoService.searchProductosPaginados(termino, pageable);
+
+        return ResponseEntity.ok(productos);
+    }
+
+
+
 }
+

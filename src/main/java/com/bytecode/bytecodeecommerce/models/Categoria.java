@@ -20,4 +20,6 @@ public class Categoria {
     @NotEmpty(message = "El nombre de la categoría no puede estar vacío")
     @Column(name = "NombreCategoria")
     private String nombreCategoria;
+    @NotEmpty(message = "La url de la categoría no puede estar vacío")
+    private String url_imagen;
 }

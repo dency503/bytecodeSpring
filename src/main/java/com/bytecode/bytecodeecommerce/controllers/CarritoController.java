@@ -87,8 +87,7 @@ public class CarritoController {
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        if (userDetails instanceof Usuario) {
-            Usuario user = (Usuario) userDetails;
+        if (userDetails instanceof Usuario user) {
 
             Optional<Cliente> clienteOptional = clienteRepository.findByUsuario(user);
 

@@ -6,12 +6,14 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import org.springframework.stereotype.Indexed;
 
 @Data
 @EqualsAndHashCode
 @NoArgsConstructor
 @Entity
 @Table(name = "Productos", schema = "Productos")
+@Indexed
 public class Producto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

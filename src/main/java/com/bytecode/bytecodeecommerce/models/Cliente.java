@@ -42,7 +42,7 @@ public class Cliente  {
     @ToString.Exclude
     private Usuario usuario;
 
-    @Pattern(regexp = "\\d{10}", message = "El número de teléfono debe tener 10 dígitos")
+
     @Column(name = "Telefono")
     private String telefono;
 
