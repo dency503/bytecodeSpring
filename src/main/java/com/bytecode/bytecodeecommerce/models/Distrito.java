@@ -24,4 +24,9 @@ public class Distrito {
     @JoinColumn(name = "Id_Municipio")
     @ToString.Exclude
     private Municipio municipio;
+
+    // Agrega este constructor
+    public Distrito(String idDistrito) {
+        this.idDistrito = idDistrito;
+    }
 }

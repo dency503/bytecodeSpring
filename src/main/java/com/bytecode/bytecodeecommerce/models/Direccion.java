@@ -1,31 +1,33 @@
 package com.bytecode.bytecodeecommerce.models;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+
 
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "Direcciones", schema = "Direccion")
+@Table(name = "direcciones", schema = "direccion")
 public class Direccion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID_Direccion")
+    @Column(name = "id_direccion")
     private int idDireccion;
 
     @NotEmpty(message = "La línea de dirección no puede estar vacía")
-    @Column(name = "Linea1")
+    @Column(name = "linea1")
     private String linea1;
 
     @ManyToOne
-    @JoinColumn(name = "ID_Distrito")
+    @JoinColumn(name = "id_distrito")
     private Distrito distrito;
 
-    @Column(name = "CodigoPostal")
-    private int codigoPostal;
+    @Column(name = "codigo_postal")
+    private String codigoPostal;
 
-    @Column(name = "Pais")
+    @Column(name = "pais")
     private String pais;
 }

@@ -1,15 +1,17 @@
 package com.bytecode.bytecodeecommerce.Service.Impl;
 
 import com.bytecode.bytecodeecommerce.Repository.ClienteRepository;
+import com.bytecode.bytecodeecommerce.Repository.DireccionRepository;
+import com.bytecode.bytecodeecommerce.Repository.DistritoRepository;
 import com.bytecode.bytecodeecommerce.Repository.UserRepository;
 import com.bytecode.bytecodeecommerce.Service.AuthenticationService;
+import com.bytecode.bytecodeecommerce.Service.ClienteService;
+import com.bytecode.bytecodeecommerce.Service.DireccionService;
 import com.bytecode.bytecodeecommerce.Service.JwtService;
 import com.bytecode.bytecodeecommerce.dao.request.SignUpRequest;
 import com.bytecode.bytecodeecommerce.dao.request.SigninRequest;
 import com.bytecode.bytecodeecommerce.dao.response.JwtAuthenticationResponse;
-import com.bytecode.bytecodeecommerce.models.Cliente;
-import com.bytecode.bytecodeecommerce.models.Role;
-import com.bytecode.bytecodeecommerce.models.Usuario;
+import com.bytecode.bytecodeecommerce.models.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,8 +32,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    private final ClienteRepository clienteRepository;
-
+    private final ClienteService clienteRepository;
+    private final DireccionService direccionService;
+    private final DireccionRepository direccionRepository;
+    private  final DistritoRepository distritoRepository;
     @Override
     @Transactional
 // Otros imports
@@ -45,9 +50,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists");
         }
 
-
-
-        // Si no hay conflictos, crea y guarda el usuario
+        // Crea y guarda el usuario
         var user = Usuario.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
@@ -55,24 +58,42 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .role(Role.USER)
                 .build();
 
+        // Crea y guarda la dirección
+        Direccion direccion = new Direccion();
+        direccion.setPais(request.getDireccion().getPais());
+        Optional<Distrito> distritoExistente = distritoRepository.findById(request.getDireccion().getDistrito().getIdDistrito());
+        if (distritoExistente.isPresent()) {
+            direccion.setDistrito(distritoExistente.orElse(null));
+        } else {
+            // Si no existe, crea un nuevo Distrito y guárdalo
+            Distrito nuevoDistrito = new Distrito();
+            nuevoDistrito.setDistrito(request.getDireccion().getDistrito().getDistrito());
+            direccion.setDistrito(nuevoDistrito);
+            distritoRepository.save(nuevoDistrito);
+        }
+        direccion.setLinea1(request.getDireccion().getLinea1());
+        // No necesitas establecer 'pais' nuevamente, ya que ya lo has establecido
+        direccionService.guardarDireccion(direccion);
+
+        // Crea y guarda el cliente
         Cliente cliente = new Cliente();
         cliente.setNombreCliente(request.getNombreCliente());
         cliente.setApellidoCliente(request.getApellidoCliente());
         cliente.setEmail(request.getEmail());
         cliente.setTelefono(request.getTelefono());
         cliente.setFechaCreacion(new Date());
-
-        // Associate Usuario with Cliente
         cliente.setUsuario(user);
+        cliente.setDireccion(direccion);
 
-        // Save Usuario and Cliente
-
+        // Guarda el Usuario, Cliente y Dirección
         userRepository.save(user);
-        clienteRepository.save(cliente);
+        clienteRepository.guardarCliente(cliente);
+
         // Crea y devuelve el token de autenticación
         var jwt = jwtService.generateToken(user);
         return JwtAuthenticationResponse.builder().token(jwt).build();
     }
+
 
 
     @Override

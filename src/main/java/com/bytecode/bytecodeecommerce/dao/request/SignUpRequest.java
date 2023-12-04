@@ -1,6 +1,7 @@
 package com.bytecode.bytecodeecommerce.dao.request;
 
 
+import com.bytecode.bytecodeecommerce.models.Direccion;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -37,4 +38,6 @@ public class SignUpRequest {
     @NotBlank(message = "Telefono cannot be blank")
 
     private String telefono;
+
+    private Direccion direccion;
 }
