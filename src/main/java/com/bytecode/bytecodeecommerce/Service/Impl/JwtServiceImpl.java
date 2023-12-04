@@ -32,7 +32,7 @@ public class JwtServiceImpl implements JwtService {
 
             // Extract email from the claims
             String email = claims.get("email", String.class);
-            System.out.println("el email es " + email);
+
             if (email != null) {
                 return email.trim();
             }

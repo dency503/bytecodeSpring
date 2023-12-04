@@ -41,7 +41,7 @@ public class MarcaController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Void> guardarMarca(@Valid @RequestBody Marca marca) {
+    public ResponseEntity<Void> guardarMarca( @RequestBody Marca marca) {
         marcaService.guardarMarca(marca);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

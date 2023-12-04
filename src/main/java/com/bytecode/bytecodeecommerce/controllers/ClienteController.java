@@ -3,6 +3,8 @@ package com.bytecode.bytecodeecommerce.controllers;
 import com.bytecode.bytecodeecommerce.Service.ClienteService;
 import com.bytecode.bytecodeecommerce.models.Cliente;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,11 +24,10 @@ public class ClienteController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Cliente>> obtenerTodosClientes() {
-        List<Cliente> clientes = clienteService.obtenerTodosClientes();
+    public ResponseEntity<Page<Cliente>> obtenerTodosClientes(Pageable pageable) {
+        Page<Cliente> clientes = clienteService.obtenerTodosClientes(pageable);
         return new ResponseEntity<>(clientes, HttpStatus.OK);
     }
-
     @GetMapping("/{id}")
     public ResponseEntity<Cliente> obtenerClientePorId(@PathVariable Long id) {
         Cliente cliente = clienteService.obtenerClientePorId(id);

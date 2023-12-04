@@ -15,15 +15,11 @@ public class Cargo {
     @Column(name = "CargoID")
     private int cargoId;
 
-    @ManyToOne
-    @JoinColumn(name = "EmpleadoID")
-    private Empleado empleado;
 
     @NotEmpty(message = "El nombre del cargo no puede estar vacío")
     @Column(name = "NombreCargo")
     private String nombreCargo;
 
-    @Column(name = "Salario")
-    private float salario;
+
 }
 

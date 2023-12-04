@@ -3,6 +3,7 @@ package com.bytecode.bytecodeecommerce.models;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.validation.constraints.Email;
 import lombok.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
@@ -39,6 +40,7 @@ public class Usuario implements UserDetails {
     private String username;
 
     @NotEmpty(message = "El correo no puede estar vacío")
+    @Email(message = "Debe ingresar un correo electrónico válido")
     @Column(name = "email")
     private String email;
     @NotEmpty(message = "La contraseña no puede estar vacía")
