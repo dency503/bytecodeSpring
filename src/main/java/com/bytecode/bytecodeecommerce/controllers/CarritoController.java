@@ -82,51 +82,63 @@ public class CarritoController {
 
     @PostMapping("/{id}/{cantidad}")
     @Transactional
-    public CarritoCompras agregarProductoAlCarrito(@PathVariable Long id, @PathVariable int cantidad,Authentication authentication) {
-        Optional<Producto> productoOptional = productoRepository.findById(id);
-
+    public ResponseEntity<CarritoCompras> agregarProductoAlCarrito(
+            @PathVariable Long id,
+            @PathVariable int cantidad,
+            Authentication authentication
+    ) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
         if (userDetails instanceof Usuario user) {
-
             Optional<Cliente> clienteOptional = clienteRepository.findByUsuario(user);
 
-           Optional<CarritoCompras> cart =  carritoRepository.findByCliente(clienteOptional.orElse(null));
+            if (clienteOptional.isPresent()) {
+                Cliente cliente = clienteOptional.get();
+                Optional<CarritoCompras> cartOptional = carritoRepository.findByCliente(cliente);
 
-        if (productoOptional.isPresent()) {
-            Producto producto = productoOptional.get();
+                if (cartOptional.isPresent()) {
+                    // El carrito ya existe, agregar el producto
+                    CarritoCompras carrito = cartOptional.get();
+                    Producto producto = productoRepository.findById(id)
+                            .orElseThrow(() -> null);
 
+                    ItemCarrito itemCarrito = new ItemCarrito();
+                    itemCarrito.setProducto(producto);
+                    itemCarrito.setCantidad(cantidad);
+                    itemCarrito.setCarritoCompras(carrito);
+                    carrito.getItems().add(itemCarrito);
 
-            if (cart.isPresent()) {
-                CarritoCompras carrito =cart.get();
-                ItemCarrito itemCarrito = new ItemCarrito();
-                itemCarrito.setProducto(producto);
-                itemCarrito.setCantidad(cantidad);
-                itemCarrito.setCarritoCompras(cart.get());
-                carrito.getItems().add(itemCarrito);
-                System.out.println("se esta guardando en la cart present");
-                for (ItemCarrito item : cart.get().getItems()) {
-                    itemCarritoRepository.save(item);
+                    // Guardar todos los elementos del carrito
+                    carritoRepository.save(carrito);
+
+                    return ResponseEntity.ok(carrito);
+                } else {
+                    // El carrito no existe, crear uno nuevo
+                    CarritoCompras nuevoCarrito = new CarritoCompras();
+                    nuevoCarrito.setCliente(cliente);
+
+                    Producto producto = productoRepository.findById(id)
+                            .orElseThrow(() -> null);
+
+                    ItemCarrito itemCarrito = new ItemCarrito();
+                    itemCarrito.setProducto(producto);
+                    itemCarrito.setCantidad(cantidad);
+                    itemCarrito.setCarritoCompras(nuevoCarrito);
+
+                    nuevoCarrito.getItems().add(itemCarrito);
+
+                    // Guardar todos los elementos del carrito
+                    carritoRepository.save(nuevoCarrito);
+
+                    return ResponseEntity.ok(nuevoCarrito);
                 }
-                return carritoRepository.save(carrito);
             } else {
-                // Manejar el caso cuando el carrito no existe
-                // Aquí puedes crear un nuevo carrito con el producto
-                CarritoCompras nuevoCarrito = new CarritoCompras();
-                nuevoCarrito.setCliente(clienteOptional.orElse(null)); // Asigna el cliente si es necesario
-                ItemCarrito itemCarrito = new ItemCarrito();
-                itemCarrito.setProducto(producto);
-                itemCarrito.setCantidad(cantidad);
-                itemCarrito.setCarritoCompras(nuevoCarrito);
-                nuevoCarrito.getItems().add(itemCarrito);
-                for (ItemCarrito item : nuevoCarrito.getItems()) {
-                    itemCarritoRepository.save(item);
-                }
-                return carritoRepository.save(nuevoCarrito);
+                // El cliente no existe
+                return ResponseEntity.notFound().build();
             }
         } else {
-            // Manejar el caso cuando el producto no existe
-            return null;
+            // Usuario no autenticado
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-    } return null;
-}}
+    }
+}

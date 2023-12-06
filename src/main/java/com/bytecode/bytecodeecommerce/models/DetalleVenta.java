@@ -25,5 +25,7 @@ public class DetalleVenta {
 
     @Column(name = "Cantidad")
     private int cantidad;
+
+    private double precioUnitario;
 }
 

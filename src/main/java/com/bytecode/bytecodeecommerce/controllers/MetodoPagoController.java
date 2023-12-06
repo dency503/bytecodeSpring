@@ -54,7 +54,7 @@ public class MetodoPagoController {
     public ResponseEntity<Void> actualizarMetodoPago(@PathVariable int id, @Valid @RequestBody MetodoPago metodoPago) {
         MetodoPago existingMetodoPago = metodoPagoService.obtenerMetodoPagoPorId(id);
         if (existingMetodoPago != null) {
-            existingMetodoPago.setTipoMetodo(metodoPago.getTipoMetodo());
+            existingMetodoPago.setNombre(metodoPago.getNombre());
             // También puedes manejar otras propiedades y relaciones aquí según tus necesidades
             metodoPagoService.guardarMetodoPago(existingMetodoPago);
             return new ResponseEntity<>(HttpStatus.OK);

@@ -1,5 +1,7 @@
 package com.bytecode.bytecodeecommerce.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import jakarta.persistence.*;
@@ -16,6 +18,7 @@ public class Departamento {
 
     @NotEmpty(message = "El nombre del departamento no puede estar vacío")
     @Column(name = "Departamento")
+
     private String departamento;
 
     @Column(name = "Pais")

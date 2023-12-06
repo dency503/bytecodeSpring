@@ -16,6 +16,6 @@ public class MetodoPago {
     private int metodoPagoId;
 
     @NotEmpty(message = "El tipo de método de pago no puede estar vacío")
-    @Column(name = "TipoMetodo")
-    private String tipoMetodo;
+    @Column(name = "nombre")
+    private String nombre;
 }

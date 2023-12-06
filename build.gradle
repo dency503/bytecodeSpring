@@ -8,7 +8,7 @@ group = 'com.bytecode'
 version = '0.0.1-SNAPSHOT'
 
 java {
-	sourceCompatibility = '17'
+	sourceCompatibility = '19'
 }
 
 configurations {
@@ -37,6 +37,7 @@ dependencies {
 // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-jackson
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.12.2'
 	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+	implementation 'com.stripe:stripe-java:24.6.0'
 
 }
 
