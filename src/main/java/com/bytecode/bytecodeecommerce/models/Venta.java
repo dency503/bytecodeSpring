@@ -1,6 +1,7 @@
 package com.bytecode.bytecodeecommerce.models;
 
 import com.bytecode.bytecodeecommerce.dao.EstadoPago;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import jakarta.persistence.*;

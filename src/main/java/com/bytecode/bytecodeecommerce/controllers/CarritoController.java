@@ -24,16 +24,18 @@ public class CarritoController {
     private final ClienteRepository clienteRepository;
     private final ProductoRepository productoRepository;
     private final ItemCarritoRepository itemCarritoRepository;
+
     @GetMapping
     public Optional<CarritoCompras> getCarrito(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
         if (userDetails instanceof Usuario user) {
 
+
             Optional<Cliente> clienteOptional = clienteRepository.findByUsuario(user);
 
-           return carritoRepository.findByCliente(clienteOptional.orElse(null));
-            }
+            return carritoRepository.findByCliente(clienteOptional.orElse(null));
+        }
         return Optional.empty();
     }
 
@@ -141,4 +143,81 @@ public class CarritoController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
+
+    @PutMapping("/{id}/{cantidad}")
+    @Transactional
+    public ResponseEntity<CarritoCompras> modificarCarrito(
+            @PathVariable Long id,
+            @PathVariable int cantidad,
+            Authentication authentication
+    ) {
+        System.out.println("hola");
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        if (userDetails instanceof Usuario user) {
+            Optional<Cliente> clienteOptional = clienteRepository.findByUsuario(user);
+
+            if (clienteOptional.isPresent()) {
+                Cliente cliente = clienteOptional.get();
+                Optional<CarritoCompras> cartOptional = carritoRepository.findByCliente(cliente);
+
+                if (cartOptional.isPresent()) {
+                    // El carrito ya existe, buscar el producto
+                    CarritoCompras carrito = cartOptional.get();
+                    Optional<ItemCarrito> itemCarritoOptional = carrito.getItems().stream()
+                            .filter(item -> item.getProducto().getProductoId() == (id))
+                            .findFirst();
+
+                    if (itemCarritoOptional.isPresent()) {
+                        // El producto está en el carrito, actualizar la cantidad
+                        ItemCarrito itemCarrito = itemCarritoOptional.get();
+                        itemCarrito.setCantidad(cantidad);
+
+                        // Guardar todos los elementos del carrito
+                        carritoRepository.save(carrito);
+
+                        return ResponseEntity.ok(carrito);
+                    } else {
+                        // El producto no está en el carrito
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+                    }
+                } else {
+                    // El carrito no existe
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+                }
+            } else {
+                // El cliente no existe
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+    }
+
+    @GetMapping("/item/{id}")
+
+    public ResponseEntity<ItemCarrito> getProductoEnCarrito(@PathVariable Long id, Authentication authentication) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        if (userDetails instanceof Usuario user) {
+            Optional<Cliente> clienteOptional = clienteRepository.findByUsuario(user);
+
+            if (clienteOptional.isPresent()) {
+                Optional<CarritoCompras> cartOptional = carritoRepository.findByCliente(clienteOptional.get());
+
+                return cartOptional.map(carrito -> {
+                    Optional<ItemCarrito> itemCarritoOptional = carrito.getItems().stream()
+                            .filter(item -> item.getProducto().getProductoId() == id)
+                            .findFirst();
+
+                    return itemCarritoOptional.map(ResponseEntity::ok)
+                            .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+                }).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+    }
+
+
 }

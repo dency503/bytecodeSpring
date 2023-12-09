@@ -5,6 +5,7 @@ package com.bytecode.bytecodeecommerce.Service;
 import com.bytecode.bytecodeecommerce.models.Venta;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface VentaService {
@@ -17,7 +18,9 @@ public interface VentaService {
     Venta modificarVenta(int ventaId, Venta nuevaVenta);
 
     @Transactional
-    String convertirCarritoAVenta(Long carritoId);
+    void convertirCarritoAVenta(Long carritoId);
 
     void eliminarVenta(int ventaId);
+
+    Page<Venta> obtenerVentasUsuario(Pageable pageable,Authentication authentication );
 }

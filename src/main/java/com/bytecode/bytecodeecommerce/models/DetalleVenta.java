@@ -1,5 +1,6 @@
 package com.bytecode.bytecodeecommerce.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import jakarta.persistence.*;
@@ -17,6 +18,7 @@ public class DetalleVenta {
 
     @ManyToOne
     @JoinColumn(name = "VentaID")
+    @JsonIgnore
     private Venta venta;
 
     @ManyToOne
@@ -27,5 +29,7 @@ public class DetalleVenta {
     private int cantidad;
 
     private double precioUnitario;
+
+
 }
 
