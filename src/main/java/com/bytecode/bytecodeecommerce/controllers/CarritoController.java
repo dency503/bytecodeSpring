@@ -52,9 +52,10 @@ public class CarritoController {
 
                 if (cart.isPresent()) {
                     CarritoCompras carrito = cart.get();
-                    Optional<ItemCarrito> itemCarritoOptional = itemCarritoRepository.findById(id);
+                    Optional<ItemCarrito> itemCarritoOptional = itemCarritoRepository.findByProducto_ProductoIdAndCarritoCompras_carritoId(id,cart.get().getCarritoId());
 
                     if (itemCarritoOptional.isPresent()) {
+
                         ItemCarrito item = itemCarritoOptional.get();
 
                         // Eliminar el elemento del carrito
@@ -151,7 +152,7 @@ public class CarritoController {
             @PathVariable int cantidad,
             Authentication authentication
     ) {
-        System.out.println("hola");
+
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
         if (userDetails instanceof Usuario user) {

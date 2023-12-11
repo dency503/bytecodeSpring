@@ -1,22 +1,27 @@
 package com.bytecode.bytecodeecommerce.Service.Impl;
 
-
-
+import com.bytecode.bytecodeecommerce.Repository.ClienteRepository;
 import com.bytecode.bytecodeecommerce.Repository.DireccionRepository;
 import com.bytecode.bytecodeecommerce.Service.DireccionService;
+import com.bytecode.bytecodeecommerce.models.Cliente;
 import com.bytecode.bytecodeecommerce.models.Direccion;
-
+import com.bytecode.bytecodeecommerce.models.Usuario;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class DireccionServiceImpl implements DireccionService {
 
     private final DireccionRepository direccionRepository;
+    private final ClienteRepository clienteRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -46,6 +51,28 @@ public class DireccionServiceImpl implements DireccionService {
         direccion.setCodigoPostal(nuevaDireccion.getCodigoPostal());
         direccion.setPais(nuevaDireccion.getPais());
         return direccionRepository.save(direccion);
+    }
+
+    @Override
+    @Transactional
+    public Direccion modificarUsuarioDireccion(Authentication authentication, Direccion nuevaDireccion) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        if (userDetails instanceof Usuario user) {
+            Optional<Cliente> clienteOptional = clienteRepository.findByUsuario(user);
+
+            if (clienteOptional.isPresent()) {
+                Cliente cliente = clienteOptional.get();
+                // Se obtiene la dirección del cliente y se actualizan los campos
+                Direccion direccion = obtenerDireccionPorId(cliente.getDireccion().getIdDireccion());
+                direccion.setLinea1(nuevaDireccion.getLinea1());
+                direccion.setDistrito(nuevaDireccion.getDistrito());
+                direccion.setCodigoPostal(nuevaDireccion.getCodigoPostal());
+                direccion.setPais(nuevaDireccion.getPais());
+                return direccionRepository.save(direccion);
+            }
+        }
+        // Devuelve null si no se encuentra el cliente o no está autenticado
+        return null;
     }
 
     @Override

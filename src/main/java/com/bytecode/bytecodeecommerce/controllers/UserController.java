@@ -67,5 +67,36 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Acceso no autorizado");
         }
     }
+
+    @PutMapping("/user")
+    public ResponseEntity<?> modificarCliente(@RequestBody Cliente clienteRequestBody, Authentication authentication) {
+        if (authentication == null || !(authentication.getPrincipal() instanceof UserDetails userDetails)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        }
+
+        if (userDetails instanceof Usuario user) {
+            Optional<Cliente> clienteOptional = clienteRepository.findByUsuario(user);
+
+            if (clienteOptional.isPresent()) {
+                Cliente cliente = clienteOptional.get();
+
+                // Actualizar todos los campos del cliente con los datos de clienteRequestBody
+                cliente.setNombreCliente(clienteRequestBody.getNombreCliente());
+                cliente.setApellidoCliente(clienteRequestBody.getApellidoCliente());
+         cliente.setTelefono(clienteRequestBody.getTelefono());
+
+
+                clienteRepository.save(cliente);
+
+                // Devolver la respuesta con el cliente modificado
+                return ResponseEntity.ok(cliente);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cliente no encontrado");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Acceso no autorizado");
+        }
+    }
+
 }
 
